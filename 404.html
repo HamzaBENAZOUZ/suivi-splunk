@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page introuvable</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#eef1f5;--text:#0f1722;--muted:#566273;--accent:#058c55;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#06080c;--text:#dbe7f3;--muted:#8395a8;--accent:#3dff9a;color-scheme:dark}}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;background:var(--bg);color:var(--text);
+  font:15px/1.6 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;text-align:center}
+h1{font-size:44px;margin:0;color:var(--accent)}
+p{color:var(--muted);margin:8px 0 20px}
+a{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <h1>&gt; 404_</h1>
+  <p>Cette page n'existe pas. / This page does not exist.</p>
+  <a href="./" id="home">&larr; Retour au suivi Splunk</a>
+</main>
+<script>
+// Sur GitHub Pages (site de projet), la racine est /<nom-du-depot>/
+var p=location.pathname.split('/').filter(Boolean);
+if(location.hostname.endsWith('github.io')&&p.length>1) document.getElementById('home').href='/'+p[0]+'/';
+</script>
+</body>
+</html>
