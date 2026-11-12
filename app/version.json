@@ -1,0 +1,9 @@
+{
+  "versionCode": 3,
+  "versionName": "1.2",
+  "apk": "suivi-splunk-v1.2.apk",
+  "notes": {
+    "fr": "Alerte de nouvelle version, connexion à l'ouverture, thème responsive.",
+    "en": "New-version alert, sign-in on launch, responsive theme."
+  }
+}

@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#06080c">
 <meta name="description" content="Suivi de ma formation Splunk : SPLK-1001, SPLK-1002, SPLK-1003.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{
   --mono:"JetBrains Mono","Cascadia Code","Fira Code","SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
@@ -301,6 +302,13 @@ nav.tabs button{display:inline-flex;align-items:center;gap:6px}
   .acct .btn{flex:1 1 auto;justify-content:center;min-height:40px}
   body::after{display:none}
 }
+/* bandeau de mise à jour de l'appli Android */
+.upd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;border-color:var(--accent);box-shadow:var(--tglow)}
+.upd .txt{flex:1 1 220px;min-width:0}
+.upd .txt b{font-family:var(--mono);color:var(--accent)}
+.upd .txt small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.upd .acts{display:flex;gap:8px}
+@media (max-width:760px){.upd .acts{width:100%}.upd .acts .btn{flex:1;justify-content:center;min-height:var(--tap)}}
 @media (max-width:380px){
   .brand h1{font-size:13px}
   .seg[aria-label] button{padding:6px 7px}
@@ -350,6 +358,7 @@ nav.tabs button{display:inline-flex;align-items:center;gap:6px}
 </header>
 
 <main class="wrap">
+  <div class="card upd hidden" id="updBox" role="status"></div>
   <details class="card controls" id="ctrl">
     <summary id="ctrlSum"></summary>
     <div class="row">
@@ -870,9 +879,45 @@ const Sync=(()=>{
   return {init,changed,render,enabled:()=>enabled};
 })();
 
+/* ---------- appli Android : alerte de nouvelle version ----------
+   L'APK ajoute « SuiviSplunkApp/<versionCode> » à son user-agent. On compare avec app/version.json
+   publié sur GitHub Pages ; si une version plus récente existe, un bandeau propose de la télécharger. */
+const AppUpdate=(()=>{
+  const m=navigator.userAgent.match(/SuiviSplunkApp\/(\d+)/), installed=m?+m[1]:0;
+  const DISMISS_KEY=STORE_KEY+"-upd-dismissed";
+  const L={fr:{t:"Nouvelle version de l'appli : {v}",dl:"Télécharger",later:"Plus tard",cur:"Installée : {c}. Ouvre le fichier téléchargé pour mettre à jour, ton avancement est conservé."},
+           en:{t:"New app version: {v}",dl:"Download",later:"Later",cur:"Installed: {c}. Open the downloaded file to update, your progress is kept."}};
+  let info=null;
+  function render(){
+    const box=$("#updBox");if(!box)return;
+    let dis=0;try{dis=+localStorage.getItem(DISMISS_KEY)||0;}catch(e){}
+    if(!info||info.versionCode<=installed||info.versionCode<=dis){box.classList.add("hidden");return;}
+    const l=L[lang]||L.fr,cur=(navigator.userAgent.match(/SuiviSplunkApp\/\d+ \(([^)]+)\)/)||[])[1]||installed;
+    box.innerHTML=`<div class="txt"><b>⬆ ${esc(l.t.replace("{v}",info.versionName))}</b>${info.notes&&info.notes[lang]?`<small>${esc(info.notes[lang])}</small>`:""}<small>${esc(l.cur.replace("{c}",cur))}</small></div>
+<div class="acts"><a class="btn primary" href="${esc(info.apk)}" id="updDl">${esc(l.dl)}</a><button type="button" class="btn" id="updLater">${esc(l.later)}</button></div>`;
+    box.classList.remove("hidden");
+  }
+  async function check(){
+    if(!installed||navigator.onLine===false)return;
+    try{
+      const r=await fetch("app/version.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)return;
+      const j=await r.json();
+      if(j&&Number.isInteger(j.versionCode)&&typeof j.apk==="string"){info={...j,apk:new URL(j.apk,location.href).href,versionName:String(j.versionName||j.versionCode)};render();}
+    }catch(e){}
+  }
+  document.addEventListener("click",e=>{if(e.target.id==="updLater"&&info){try{localStorage.setItem(DISMISS_KEY,String(info.versionCode));}catch(x){}render();}});
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")check();});
+  return {check,render,installed:()=>installed};
+})();
+document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",()=>AppUpdate.render()));
+
 /* ---------- init ---------- */
 applyLang();
 Sync.init();
+AppUpdate.check();
+// Hors ligne sur le site web (l'appli Android embarque déjà le site, pas besoin de service worker)
+if("serviceWorker" in navigator&&!AppUpdate.installed()&&(location.protocol==="https:"||location.hostname==="localhost"))
+  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 if(P.tab&&P.tab!=="plan"){const b=document.querySelector(`nav.tabs button[data-tab="${P.tab}"]`);b&&b.click();}
 </script>
 </body>
