@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Suivi formation Splunk</title>
 <meta name="theme-color" content="#06080c">
 <meta name="description" content="Suivi de ma formation Splunk : SPLK-1001, SPLK-1002, SPLK-1003.">
@@ -208,9 +208,123 @@ footer{color:var(--muted);font-size:12px;padding:20px 0 40px;border-top:1px soli
   .kpi .v{font-size:18px}
   th,td{padding:7px 6px}
 }
+
+/* ===== v2 : écran de connexion, compte, mise en page responsive ===== */
+:root{--radius:10px;--tap:44px;--safe-b:env(safe-area-inset-bottom,0px);--safe-t:env(safe-area-inset-top,0px)}
+body{font-size:clamp(14.5px,.35vw + 13px,16px)}
+.wrap{max-width:1240px;padding:0 clamp(12px,3vw,28px)}
+.card,details.week{border-radius:var(--radius)}
+.card::before,details.week::before{border-top-left-radius:var(--radius)}
+/* lock : tant qu'on n'est pas connecté, seule la porte d'entrée est visible */
+body.locked header.top,body.locked main,body.locked footer,body.locked nav.tabs{display:none!important}
+body:not(.locked) #gate{display:none}
+.gate{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:calc(24px + var(--safe-t)) 16px calc(24px + var(--safe-b))}
+.gate-card{width:100%;max-width:420px;padding:clamp(20px,5vw,32px);display:flex;flex-direction:column;gap:16px}
+.gate-top{display:flex;align-items:center;gap:12px}
+.gate-top .logo{width:46px;height:46px;font-size:17px;border-radius:10px}
+.gate h1{font:700 clamp(18px,4.5vw,22px)/1.2 var(--mono);margin:0}
+.gate h1::after{content:"_";color:var(--accent);margin-left:2px;animation:blink 1.1s steps(1) infinite}
+.gate .lead{margin:0;color:var(--muted);font-size:14px}
+.gate form{display:flex;flex-direction:column;gap:12px}
+.gate .field{font-size:13px}
+.gate .field input{min-height:var(--tap);font-size:16px;width:100%}
+.gate .btn{min-height:var(--tap);justify-content:center;font-size:14.5px;width:100%}
+.gate .tools .btn{width:auto;min-height:36px}
+.gate .alt{display:flex;align-items:center;gap:10px;color:var(--muted);font:12px var(--mono)}
+.gate .alt::before,.gate .alt::after{content:"";flex:1;height:1px;background:var(--border)}
+.gate .tools{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.gate .msg{margin:0;color:var(--warn);font-size:13.5px;font-family:var(--mono)}
+.gate .msg.ok{color:var(--accent)}
+.gate .msg:empty{display:none}
+.gate .btn[disabled]{opacity:.6;cursor:progress}
+/* pastille de synchro dans l'en-tête */
+.pill{display:inline-flex;align-items:center;gap:6px;max-width:220px;border:1px solid var(--border-strong);background:var(--surface);border-radius:999px;padding:4px 10px;min-height:32px;font:12px var(--mono);color:var(--muted);cursor:pointer;white-space:nowrap}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.pill.synced .dot{background:var(--accent);box-shadow:var(--tglow)}
+.pill.syncing .dot{background:var(--t-cours);animation:blink 1s steps(1) infinite}
+.pill.err .dot,.pill.offline .dot{background:var(--warn)}
+.pill .em{overflow:hidden;text-overflow:ellipsis}
+.acct{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.acct .who{font:13px var(--mono);overflow-wrap:anywhere;margin-right:auto}
+/* icônes d'onglets */
+nav.tabs svg{width:18px;height:18px;flex:none;display:none}
+nav.tabs button{display:inline-flex;align-items:center;gap:6px}
+/* grands écrans : progression sur deux colonnes */
+@media (min-width:1000px){
+  #tab-suivi .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #tab-suivi .kpis,#tab-suivi #nextCard{grid-column:1 / -1}
+  .controls>.row:first-of-type{flex-wrap:nowrap}
+}
+/* tablettes */
+@media (max-width:1000px) and (min-width:761px){
+  .mini,.brand small{display:none}
+  .bar{flex-wrap:nowrap}
+  .sess{grid-template-columns:28px 104px 48px 1fr auto}
+  .sess .content{grid-column:4;grid-row:1}
+  .sess .sectwrap{grid-column:4;grid-row:2}
+  .sess .notecell{grid-column:5;grid-row:1}
+}
+/* téléphones : barre d'onglets en bas, cartes plus aérées */
+@media (max-width:760px){
+  header.top{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg);padding-top:var(--safe-t)}
+  .pill .em{display:none}
+  .pill{padding:4px 8px}
+  .seg button{padding:6px 9px;min-height:34px}
+  nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;margin:0;padding:4px 4px calc(4px + var(--safe-b));gap:0;
+    background:color-mix(in srgb,var(--surface) 96%,transparent);border-top:1px solid var(--border);box-shadow:0 -6px 20px rgba(0,0,0,.18);overflow:visible}
+  nav.tabs button{flex:1 1 0;min-width:0;flex-direction:column;gap:2px;padding:6px 2px;min-height:52px;border-bottom:0;border-top:2px solid transparent;font-size:10.5px;justify-content:center}
+  nav.tabs button::before{content:none}
+  nav.tabs button[aria-selected="true"]{border-top-color:var(--accent);border-bottom:0}
+  nav.tabs button span{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  nav.tabs svg{display:block}
+  main{padding:12px 0 calc(84px + var(--safe-b))}
+  footer{padding-bottom:calc(90px + var(--safe-b))}
+  .toast{bottom:calc(76px + var(--safe-b))}
+  .card{padding:14px}
+  .controls .row{gap:8px}
+  .controls .field{flex:1 1 100%}
+  .controls .seg{display:flex}.controls .seg button{flex:1}
+  .field input{width:100%}
+  .filters{margin:12px 0}
+  .filters input[type=search]{flex:1 1 100%;min-height:42px;font-size:16px}
+  .filters select{flex:1 1 40%;min-width:0;min-height:40px}
+  .filters .btn.small{flex:1 1 100%;min-height:40px;justify-content:center}
+  .filters .chk{flex:1 1 auto}
+  details.week>summary{padding:12px}
+  .wk-phase{order:3}
+  .sess{padding:12px;gap:4px 10px}
+  .sess input[type=checkbox]{width:24px;height:24px}
+  .notebtn{min-height:36px;padding:6px 8px;border:1px dashed var(--border-strong)}
+  .next .btn{width:100%;justify-content:center;min-height:var(--tap)}
+  .exam .checks label{min-height:40px}
+  #examGrid{grid-template-columns:minmax(0,1fr)!important}
+  .acct .btn{flex:1 1 auto;justify-content:center;min-height:40px}
+  body::after{display:none}
+}
+@media (max-width:380px){
+  .brand h1{font-size:13px}
+  .seg[aria-label] button{padding:6px 7px}
+}
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="gate" class="gate">
+  <div class="card gate-card">
+    <div class="gate-top"><div class="logo" aria-hidden="true">&gt;_</div><div><h1 data-i18n="title"></h1><p class="lead" data-i18n="gateLead"></p></div></div>
+    <form id="gateForm" autocomplete="on" novalidate>
+      <label class="field"><span data-i18n="email"></span><input type="email" name="email" id="gEmail" required autocomplete="username" inputmode="email"></label>
+      <label class="field"><span data-i18n="pwd"></span><input type="password" name="pwd" id="gPwd" required minlength="6" autocomplete="current-password"></label>
+      <button type="submit" class="btn primary" id="gLogin" data-i18n="login"></button>
+      <div class="alt" data-i18n="or"></div>
+      <button type="button" class="btn" id="gSignup" data-i18n="signup"></button>
+      <p class="msg" id="gateMsg" role="status" aria-live="polite"></p>
+    </form>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="Langue / Language"><button type="button" data-lang="fr" aria-pressed="true">FR</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+      <button type="button" class="btn small themeBtn"></button>
+    </div>
+  </div>
+</div>
 <header class="top">
   <div class="wrap">
     <div class="bar">
@@ -222,20 +336,21 @@ footer{color:var(--muted);font-size:12px;padding:20px 0 40px;border-top:1px soli
       <div class="seg" role="group" aria-label="Langue / Language">
         <button type="button" data-lang="fr" aria-pressed="true">FR</button><button type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
-      <button type="button" class="btn" id="themeBtn"></button>
+      <button type="button" class="pill" id="syncPill" hidden><span class="dot"></span><span class="em" id="syncPillTxt"></span></button>
+      <button type="button" class="btn themeBtn" id="themeBtn"></button>
     </div>
     <nav class="tabs" role="tablist">
-      <button role="tab" data-tab="plan" aria-selected="true" data-i18n="tabPlan"></button>
-      <button role="tab" data-tab="suivi" aria-selected="false" data-i18n="tabSuivi"></button>
-      <button role="tab" data-tab="exams" aria-selected="false" data-i18n="tabExams"></button>
-      <button role="tab" data-tab="budget" aria-selected="false" data-i18n="tabBudget"></button>
-      <button role="tab" data-tab="res" aria-selected="false" data-i18n="tabRes"></button>
+      <button role="tab" data-tab="plan" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v16H3zM3 9h18M8 3v4M16 3v4"/></svg><span data-i18n="tabPlan"></span></button>
+      <button role="tab" data-tab="suivi" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-i18n="tabSuivi"></span></button>
+      <button role="tab" data-tab="exams" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5zM6 10v5c3 3 9 3 12 0v-5"/></svg><span data-i18n="tabExams"></span></button>
+      <button role="tab" data-tab="budget" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v12H4zM4 7l2-3h12l2 3M16 13h2"/></svg><span data-i18n="tabBudget"></span></button>
+      <button role="tab" data-tab="res" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span data-i18n="tabRes"></span></button>
     </nav>
   </div>
 </header>
 
 <main class="wrap">
-  <details class="card controls" id="ctrl" open>
+  <details class="card controls" id="ctrl">
     <summary id="ctrlSum"></summary>
     <div class="row">
       <div class="field"><span data-i18n="scenario"></span>
@@ -247,9 +362,6 @@ footer{color:var(--muted);font-size:12px;padding:20px 0 40px;border-top:1px soli
     </div>
     <p class="desc" id="scenDesc"></p>
     <div class="row">
-      <button type="button" class="btn primary" id="exportBtn" data-i18n="export"></button>
-      <button type="button" class="btn" id="importBtn" data-i18n="import"></button>
-      <input type="file" id="importFile" accept=".json,application/json" class="hidden">
       <button type="button" class="btn" id="resetBtn" data-i18n="reset"></button>
       <span class="desc" id="saveState"></span>
     </div>
@@ -308,11 +420,11 @@ const STORE_KEY = "splunk-suivi-v1";
 const APP_ID = "splunk-training-tracker";
 
 const I18N = {
-fr:{title:"Suivi formation Splunk",settings:"Réglages et sauvegarde",subtitle:"SPLK-1001 → SPLK-1002 → SPLK-1003",tabPlan:"Planning",tabSuivi:"Progression",tabExams:"Examens",tabBudget:"Budget",tabRes:"Ressources",
-scenario:"Scénario",startDate:"Date de début (lundi)",export:"Exporter l'avancement",import:"Charger un fichier de suivi",reset:"Tout décocher",
+fr:{title:"Suivi formation Splunk",settings:"Réglages et compte",subtitle:"SPLK-1001 → SPLK-1002 → SPLK-1003",tabPlan:"Planning",tabSuivi:"Progression",tabExams:"Examens",tabBudget:"Budget",tabRes:"Ressources",
+scenario:"Scénario",startDate:"Date de début (lundi)",reset:"Tout décocher",gateLead:"Connecte-toi pour retrouver ton avancement sur tous tes appareils.",email:"Email",pwd:"Mot de passe",login:"Se connecter",signup:"Créer mon compte",or:"pas encore de compte ?",
 search:"Rechercher une séance…",allPhases:"Toutes les phases",allTypes:"Tous les types",hideDone:"Masquer les séances faites",gotoNext:"Aller à la prochaine séance",
 week:"Semaine",sessions:"séances",late:"en retard",note:"Note",addNote:"+ note",noteph:"Vos notes sur cette séance…",noResults:"Aucune séance ne correspond aux filtres.",
-saved:"Enregistré dans ce navigateur",notSaved:"Stockage local indisponible : pensez à exporter votre avancement.",
+saved:"Enregistré sur cet appareil",notSaved:"Stockage local indisponible : l'avancement est gardé dans ton compte.",
 done:"Faites",pctSessions:"% séances",hPlanned:"Heures prévues",hDone:"Heures faites",pctHours:"% heures",phase:"Phase",total:"TOTAL",
 kSessions:"Séances faites",kHours:"Heures faites",kLate:"Séances en retard",kNextExam:"Prochain examen",kEnd:"Fin du planning",of:"sur",
 nextTitle:"Prochaine séance",markDone:"Marquer comme faite",nothingLeft:"Toutes les séances sont faites. Bravo !",byPhase:"Progression par phase",compare:"Comparaison des scénarios",
@@ -326,15 +438,13 @@ budgetTotal:"TOTAL (tout réussi du 1er coup)",budgetRetake:"Par repassage éven
 resNote:"Les sections et durées viennent des sommaires Udemy des 4 cours (Essentials 5 h 57, User 15 h 06, Power User 18 h 13, Admin 28 h 15). Chaque séance prévoit le temps vidéo + la manipulation sur la VM.",
 themeLight:"☀️ Clair",themeDark:"🌙 Sombre",
 confirmReset:"Décocher toutes les séances du scénario « {s} » et effacer ses notes ?",resetDone:"Scénario remis à zéro",
-exported:"Fichier exporté",imported:"Avancement chargé depuis le fichier",importErr:"Ce fichier n'est pas un fichier de suivi valide.",
-confirmImport:"Remplacer l'avancement actuel par celui du fichier « {f} » ?",
-footer:"Fichier autonome : fonctionne hors ligne. L'avancement est enregistré dans ce navigateur ; exportez-le pour le sauvegarder ou le transférer sur un autre appareil.",
+footer:"Ton avancement est enregistré dans ton compte et synchronisé entre tes appareils. Hors ligne, il est gardé ici et envoyé au retour du réseau.",
 h:"h"},
-en:{title:"Splunk training tracker",settings:"Settings and backup",subtitle:"SPLK-1001 → SPLK-1002 → SPLK-1003",tabPlan:"Schedule",tabSuivi:"Progress",tabExams:"Exams",tabBudget:"Budget",tabRes:"Resources",
-scenario:"Scenario",startDate:"Start date (Monday)",export:"Export progress",import:"Load a progress file",reset:"Uncheck all",
+en:{title:"Splunk training tracker",settings:"Settings and account",subtitle:"SPLK-1001 → SPLK-1002 → SPLK-1003",tabPlan:"Schedule",tabSuivi:"Progress",tabExams:"Exams",tabBudget:"Budget",tabRes:"Resources",
+scenario:"Scenario",startDate:"Start date (Monday)",reset:"Uncheck all",gateLead:"Sign in to get your progress back on all your devices.",email:"Email",pwd:"Password",login:"Sign in",signup:"Create account",or:"no account yet?",
 search:"Search sessions…",allPhases:"All phases",allTypes:"All types",hideDone:"Hide completed sessions",gotoNext:"Go to next session",
 week:"Week",sessions:"sessions",late:"overdue",note:"Note",addNote:"+ note",noteph:"Your notes on this session…",noResults:"No session matches the filters.",
-saved:"Saved in this browser",notSaved:"Local storage unavailable: remember to export your progress.",
+saved:"Saved on this device",notSaved:"Local storage unavailable: progress is kept in your account.",
 done:"Done",pctSessions:"% sessions",hPlanned:"Planned hours",hDone:"Hours done",pctHours:"% hours",phase:"Phase",total:"TOTAL",
 kSessions:"Sessions done",kHours:"Hours done",kLate:"Overdue sessions",kNextExam:"Next exam",kEnd:"Schedule ends",of:"of",
 nextTitle:"Next session",markDone:"Mark as done",nothingLeft:"Every session is done. Well done!",byPhase:"Progress by phase",compare:"Scenario comparison",
@@ -348,9 +458,7 @@ budgetTotal:"TOTAL (everything passed first time)",budgetRetake:"Per possible re
 resNote:"Sections and durations come from the Udemy outlines of the 4 courses (Essentials 5 h 57, User 15 h 06, Power User 18 h 13, Admin 28 h 15). Each session includes video time + hands-on work on the VM.",
 themeLight:"☀️ Light",themeDark:"🌙 Dark",
 confirmReset:"Uncheck every session of the “{s}” scenario and clear its notes?",resetDone:"Scenario reset",
-exported:"File exported",imported:"Progress loaded from the file",importErr:"This file is not a valid progress file.",
-confirmImport:"Replace current progress with the one in “{f}”?",
-footer:"Standalone file: works offline. Progress is saved in this browser; export it to back it up or move it to another device.",
+footer:"Your progress is saved in your account and synced across your devices. Offline, it is kept here and uploaded when you are back online.",
 h:"h"}};
 
 const SCEN_LABEL = {fr:{Optimiste:"Optimiste",Réaliste:"Réaliste",Pessimiste:"Pessimiste"},en:{Optimiste:"Optimistic",Réaliste:"Realistic",Pessimiste:"Pessimistic"}};
@@ -442,8 +550,8 @@ function applyTheme(){
   if(theme)document.documentElement.setAttribute("data-theme",theme);else document.documentElement.removeAttribute("data-theme");
   const eff=effectiveTheme();
   const lab=eff==="dark"?t("themeLight"):t("themeDark");const [ic,...rest]=lab.split(" ");
-  $("#themeBtn").innerHTML=`<span aria-hidden="true">${ic}</span><span class="lbl">${esc(rest.join(" "))}</span>`;
-  $("#themeBtn").setAttribute("aria-label",eff==="dark"?t("themeLight"):t("themeDark"));
+  document.querySelectorAll(".themeBtn").forEach(b=>{b.innerHTML=`<span aria-hidden="true">${ic}</span><span class="lbl">${esc(rest.join(" "))}</span>`;
+    b.setAttribute("aria-label",eff==="dark"?t("themeLight"):t("themeDark"));});
   document.querySelector('meta[name="theme-color"]').content=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
 }
 matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>{if(!theme)applyTheme();});
@@ -567,7 +675,7 @@ function renderAll(){renderControls();renderPlan();renderSuivi();renderExams();r
 /* ---------- events ---------- */
 document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;P.lang=lang;savePrefs(P);applyLang();}));
 document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",()=>Sync.render()));
-$("#themeBtn").addEventListener("click",()=>{theme=effectiveTheme()==="dark"?"light":"dark";P.theme=theme;savePrefs(P);applyTheme();});
+document.querySelectorAll(".themeBtn").forEach(b=>b.addEventListener("click",()=>{theme=effectiveTheme()==="dark"?"light":"dark";P.theme=theme;savePrefs(P);applyTheme();}));
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll("nav.tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
   document.querySelectorAll("[role=tabpanel]").forEach(p=>p.classList.toggle("hidden",p.id!=="tab-"+b.dataset.tab));
@@ -603,22 +711,6 @@ $("#gotoToday").addEventListener("click",()=>{
   openWeeks.add(rows()[i][0]);renderPlan();
   const el=document.getElementById("s-"+i);if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.querySelector("input").focus({preventScroll:true});}
 });
-$("#exportBtn").addEventListener("click",()=>{
-  const payload={...S,app:APP_ID,version:1,exportedAt:new Date().toISOString()};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
-  const a=document.createElement("a");const d=new Date();const stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  a.href=URL.createObjectURL(blob);a.download=`suivi-splunk-${stamp}.json`;document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);toast(t("exported"));
-});
-$("#importBtn").addEventListener("click",()=>$("#importFile").click());
-$("#importFile").addEventListener("change",async e=>{
-  const f=e.target.files[0];e.target.value="";if(!f)return;
-  try{const obj=JSON.parse(await f.text());
-    if(!obj||obj.app!==APP_ID||!obj.done)throw new Error("bad");
-    if(!confirm(t("confirmImport").replace("{f}",f.name)))return;
-    S=normalize(obj);openWeeks=null;save();renderAll();toast(t("imported"));
-  }catch(err){toast(t("importErr"));}
-});
 $("#resetBtn").addEventListener("click",()=>{
   if(!confirm(t("confirmReset").replace("{s}",SCEN_LABEL[lang][S.scenario])))return;
   S.done[S.scenario]={};S.notes[S.scenario]={};save();renderAll();toast(t("resetDone"));
@@ -634,12 +726,12 @@ const Sync=(()=>{
       syncNow:"Synchroniser",as:"Connecté : {e}",off:"Non connecté : l'avancement reste dans ce navigateur.",synced:"Synchronisé",syncing:"Synchronisation…",
       offline:"Hors ligne : enregistré ici, envoi au retour du réseau",err:"Erreur de synchronisation",badLogin:"Email ou mot de passe incorrect.",
       confirm:"Compte créé. Ouvre le lien reçu par email pour le confirmer, puis connecte-toi.",welcome:"Connecté, avancement synchronisé",
-      pulled:"Avancement mis à jour depuis le cloud",short:"Mot de passe : 8 caractères minimum.",notConfirmed:"Email pas encore confirmé : clique sur le lien reçu."},
+      pulled:"Avancement mis à jour depuis le cloud",offline0:"Pas de connexion internet : réessaie une fois en ligne.",short:"Mot de passe : 8 caractères minimum.",notConfirmed:"Email pas encore confirmé : clique sur le lien reçu."},
     en:{title:"Online sync",email:"Email",pwd:"Password",login:"Sign in",signup:"Create account",logout:"Sign out",
       syncNow:"Sync now",as:"Signed in: {e}",off:"Not signed in: progress stays in this browser.",synced:"Synced",syncing:"Syncing…",
       offline:"Offline: saved here, will upload when back online",err:"Sync error",badLogin:"Wrong email or password.",
       confirm:"Account created. Open the link sent by email to confirm it, then sign in.",welcome:"Signed in, progress synced",
-      pulled:"Progress updated from the cloud",short:"Password: at least 8 characters.",notConfirmed:"Email not confirmed yet: click the link you received."}};
+      pulled:"Progress updated from the cloud",offline0:"No internet connection: try again once online.",short:"Password: at least 8 characters.",notConfirmed:"Email not confirmed yet: click the link you received."}};
   const tt=k=>(L[lang]||L.fr)[k];
   let sess=null,status="",busy=false,pushTimer=null,lastErr="";
   const rd=k=>{try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}};
@@ -661,7 +753,7 @@ const Sync=(()=>{
     if(!sess)return false;
     if(sess.expires_at-60>Date.now()/1000)return true;
     try{setSess(fromToken(await api("/auth/v1/token?grant_type=refresh_token",{method:"POST",auth:false,body:{refresh_token:sess.refresh_token}})));return true;}
-    catch(e){if(e.status>=400&&e.status<500){setSess(null);render();}throw e;}
+    catch(e){if(e.status>=400&&e.status<500){setSess(null);status="";render();lock(true);}throw e;}
   }
   async function pull(){
     await fresh();
@@ -708,56 +800,58 @@ const Sync=(()=>{
       busy=false;render();
     },1200);
   }
+  function lock(on){document.body.classList.toggle("locked",!!on);if(on)setTimeout(()=>{const e=$("#gEmail");e&&!e.value&&e.focus();},50);}
   async function login(email,pwd,isSignup){
-    const msg=$("#syncMsg");msg.textContent="";
+    const msg=$("#gateMsg");msg.textContent="";msg.classList.remove("ok");
+    if(!email||!/^\S+@\S+\.\S+$/.test(email)){msg.textContent=lang==="fr"?"Email invalide.":"Invalid email.";return;}
+    if(!pwd){msg.textContent=lang==="fr"?"Mot de passe requis.":"Password required.";return;}
     if(isSignup&&pwd.length<8){msg.textContent=tt("short");return;}
+    const btns=document.querySelectorAll("#gateForm button");btns.forEach(b=>b.disabled=true);
     try{
       if(isSignup){
         const redirect=encodeURIComponent(location.origin+location.pathname);
         const j=await api("/auth/v1/signup?redirect_to="+redirect,{method:"POST",auth:false,body:{email,password:pwd}});
         if(j&&j.access_token){setSess(fromToken(j));}
-        else{msg.textContent=tt("confirm");return;}
+        else{msg.textContent=tt("confirm");msg.classList.add("ok");return;}
       }else{
         setSess(fromToken(await api("/auth/v1/token?grant_type=password",{method:"POST",auth:false,body:{email,password:pwd}})));
       }
-      render();await syncNow(true);if(status==="synced")toast(tt("welcome"));
+      $("#gPwd").value="";
+      lock(false);render();await syncNow(true);if(status==="synced")toast(tt("welcome"));
     }catch(e){
-      msg.textContent=e.code==="email_not_confirmed"||/not confirmed/i.test(e.message)?tt("notConfirmed"):(e.status===400&&!isSignup?tt("badLogin"):e.message);
-    }
+      msg.textContent=e.code==="email_not_confirmed"||/not confirmed/i.test(e.message)?tt("notConfirmed"):(e.status===400&&!isSignup?tt("badLogin"):(navigator.onLine===false||e instanceof TypeError?tt("offline0"):e.message));
+    }finally{btns.forEach(b=>b.disabled=false);}
   }
   async function logout(){
     try{if(sess)await api("/auth/v1/logout",{method:"POST"});}catch(e){}
-    setSess(null);status="";render();
+    setSess(null);status="";
+    // on ne garde pas l'avancement d'un compte sur l'appareil après déconnexion
+    S=defaultState();try{localStorage.removeItem(STORE_KEY);}catch(e){}wr(META_KEY,null);
+    openWeeks=null;renderAll();render();lock(true);
   }
   function render(){
-    const box=$("#syncBox");if(!box)return;
-    if(!enabled){box.classList.add("hidden");return;}
+    const pill=$("#syncPill"),box=$("#syncBox");if(!pill||!box)return;
+    if(!enabled||!sess){pill.hidden=true;box.classList.add("hidden");return;}
+    const email=sess.user&&sess.user.email||"";
+    pill.hidden=false;pill.className="pill "+(status||"");
+    $("#syncPillTxt").textContent=status?tt(status):email;
+    pill.title=(status?tt(status)+" · ":"")+email+(lastErr?" · "+lastErr:"");
     box.classList.remove("hidden");
-    const head=`<div class="sync-h">☁ ${esc(tt("title"))}</div>`;
-    if(sess){
-      const st=status?`<span class="sync-st ${esc(status)}" title="${esc(lastErr)}">${status==="synced"?"✓ ":status==="err"||status==="offline"?"⚠ ":"⟳ "}${esc(tt(status))}</span>`:"";
-      box.innerHTML=`${head}<div class="row"><span class="desc">${esc(tt("as").replace("{e}",sess.user.email||""))}</span>${st}
+    const st=status?`<span class="sync-st ${esc(status)}" title="${esc(lastErr)}">${status==="synced"?"✓ ":status==="err"||status==="offline"?"⚠ ":"⟳ "}${esc(tt(status))}</span>`:"";
+    box.innerHTML=`<div class="sync-h">☁ ${esc(tt("title"))}</div><div class="acct"><span class="who">${esc(tt("as").replace("{e}",email))}</span>${st}
 <button type="button" class="btn small" id="syncNowBtn">${esc(tt("syncNow"))}</button>
 <button type="button" class="btn small" id="logoutBtn">${esc(tt("logout"))}</button></div>`;
-    }else{
-      const keep=box.querySelector("#syncForm");const ev=keep?keep.email.value:"";
-      box.innerHTML=`${head}<p class="desc">${esc(tt("off"))}</p>
-<form class="row" id="syncForm" autocomplete="on">
-<label class="field"><span>${esc(tt("email"))}</span><input type="email" name="email" required autocomplete="username" value="${esc(ev)}"></label>
-<label class="field"><span>${esc(tt("pwd"))}</span><input type="password" name="pwd" required minlength="6" autocomplete="current-password"></label>
-<button type="submit" class="btn primary">${esc(tt("login"))}</button>
-<button type="button" class="btn" id="signupBtn">${esc(tt("signup"))}</button>
-</form><p class="desc sync-msg" id="syncMsg" role="status"></p>`;
-    }
   }
   document.addEventListener("click",e=>{
-    if(e.target.id==="syncNowBtn")syncNow(false);
-    else if(e.target.id==="logoutBtn")logout();
-    else if(e.target.id==="signupBtn"){const f=$("#syncForm");if(f.reportValidity())login(f.email.value.trim(),f.pwd.value,true);}
+    const id=e.target.closest("button")&&e.target.closest("button").id;
+    if(id==="syncNowBtn")syncNow(false);
+    else if(id==="logoutBtn")logout();
+    else if(id==="syncPill"){const c=$("#ctrl");c.open=true;c.scrollIntoView({behavior:"smooth",block:"start"});}
+    else if(id==="gSignup")login($("#gEmail").value.trim(),$("#gPwd").value,true);
   });
-  document.addEventListener("submit",e=>{if(e.target.id!=="syncForm")return;e.preventDefault();const f=e.target;login(f.email.value.trim(),f.pwd.value,false);});
+  document.addEventListener("submit",e=>{if(e.target.id!=="gateForm")return;e.preventDefault();login($("#gEmail").value.trim(),$("#gPwd").value,false);});
   function init(){
-    if(!enabled){render();return;}
+    if(!enabled){lock(false);render();return;}
     sess=rd(SESS_KEY);
     // Retour du lien de confirmation email : #access_token=...&refresh_token=...
     if(location.hash.includes("access_token=")){
@@ -768,8 +862,8 @@ const Sync=(()=>{
       }
       history.replaceState(null,"",location.pathname+location.search);
     }
-    render();
-    if(sess)syncNow(true);else $("#ctrl").open=true;
+    lock(!sess);render();
+    if(sess)syncNow(true);
     document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&sess)syncNow(false);});
     addEventListener("online",()=>{if(sess)syncNow(true);});
   }
@@ -777,7 +871,6 @@ const Sync=(()=>{
 })();
 
 /* ---------- init ---------- */
-if(matchMedia("(max-width:760px)").matches)$("#ctrl").open=false;
 applyLang();
 Sync.init();
 if(P.tab&&P.tab!=="plan"){const b=document.querySelector(`nav.tabs button[data-tab="${P.tab}"]`);b&&b.click();}
